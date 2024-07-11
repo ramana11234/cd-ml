@@ -90,3 +90,146 @@ for train_index, test_index in kf.split(X):
 
 avg_mse_CV = np.mean(mse_scores_cv)
 print("K-Fold Cross Validation MSE:", avg_mse_CV)
+
+week-5 txt:
+
+import pandas as pd
+from sklearn.model_selection import train_test_split, cross_val_score, KFold, ShuffleSplit
+from sklearn.ensemble import RandomForestClassifier
+import matplotlib.pyplot as plt
+
+# Load the Lower Back Pain Symptoms dataset
+data = pd.read_csv("/content/drive/MyDrive/spine.csv")
+
+# Preprocessing
+X = data.drop(columns=['target'])
+y = data['target']
+
+# Model Training
+# 1. Holdout Method
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+clf_holdout = RandomForestClassifier(random_state=42)
+clf_holdout.fit(X_train, y_train)
+holdout_score = clf_holdout.score(X_test, y_test)
+
+# 2. K-Fold Cross Validation
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+clf_kfold = RandomForestClassifier(random_state=42)
+kfold_scores = cross_val_score(clf_kfold, X, y, cv=kf)
+mean_kfold_score = kfold_scores.mean()
+
+# 3. Bootstrap Sampling
+bs = ShuffleSplit(n_splits=5, test_size=0.2, random_state=42)
+clf_bootstrap = RandomForestClassifier(random_state=42)
+bootstrap_scores = cross_val_score(clf_bootstrap, X, y, cv=bs)
+mean_bootstrap_score = bootstrap_scores.mean()
+
+# Display Results
+print("Holdout Method Score:", holdout_score)
+print("K-Fold Cross Validation Mean Score:", mean_kfold_score)
+print("Bootstrap Sampling Mean Score:", mean_bootstrap_score)
+
+# Comparison Plot
+scores = [holdout_score, mean_kfold_score, mean_bootstrap_score]
+methods = ['Holdout', 'K-Fold', 'Bootstrap']
+
+plt.figure(figsize=(8, 6))
+plt.bar(methods, scores, color=['blue', 'green', 'orange'])
+plt.xlabel('Method')
+plt.ylabel('Accuracy')
+plt.title('Comparison of Model Training Methods')
+plt.ylim(0.8, 1.0)
+plt.show()
+
+
+Week 6:
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from sklearn.metrics.cluster import contingency_matrix
+
+# Load the Lower Back Pain Symptoms dataset
+data = pd.read_csv("/content/drive/MyDrive/spine.csv")
+
+# Preprocessing (if needed)
+# Assuming no preprocessing required for simplicity
+
+# Splitting data for supervised learning
+X = data.drop(columns=['target'])
+
+
+
+#decision tree
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.metrics import accuracy_score
+
+# Load the Lower Back Pain Symptoms dataset
+data = pd.read_csv("/content/drive/MyDrive/spine.csv")
+
+# Preprocessing
+X = data.drop(columns=['target'])
+y = data['target']
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Decision Tree Classifier with entropy
+dt_classifier = DecisionTreeClassifier(criterion='entropy', random_state=42)
+dt_classifier.fit(X_train, y_train)
+
+# Plotting the decision tree with entropy values
+plt.figure(figsize=(12, 8))
+plot_tree(dt_classifier, feature_names=X.columns, class_names=np.unique(y), filled=True, fontsize=10)
+plt.show()
+
+# Evaluate the Decision Tree Classifier
+dt_predictions = dt_classifier.predict(X_test)
+dt_accuracy = accuracy_score(y_test, dt_predictions)
+print("Decision Tree Accuracy:", dt_accuracy)
+
+
+y = data['target']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 1. Supervised Learning - Classification
+# Training a Random Forest classifier
+clf = RandomForestClassifier(random_state=42)
+clf.fit(X_train, y_train)
+
+# Evaluating the classifier
+y_pred = clf.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred, average='weighted')
+recall = recall_score(y_test, y_pred, average='weighted')
+f1 = f1_score(y_test, y_pred, average='weighted')
+
+print("Supervised Learning - Classification Metrics:")
+print("Accuracy:", accuracy)
+print("Precision:", precision)
+print("Recall:", recall)
+print("F1-score:", f1)
+
+# 2. Supervised Learning - Regression
+# Not applicable for this dataset
+
+# 3. Unsupervised Learning - Clustering
+# Using K-means clustering
+kmeans = KMeans(n_clusters=2, random_state=42)
+kmeans.fit(X)
+
+# Evaluate cluster quality
+silhouette = silhouette_score(X, kmeans.labels_)
+contingency = contingency_matrix(y, kmeans.labels_)
+purity = np.sum(np.amax(contingency, axis=0)) / np.sum(contingency)
+
+print("\nUnsupervised Learning - Clustering Metrics:")
+print("Purity:", purity)
+print("Silhouette Width:", silhouette)
